@@ -1,24 +1,58 @@
 package com.spring.springrest.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.spring.springrest.service.NumberService;
+import com.spring.springrest.model.User;
+import com.spring.springrest.service.UserService;
 
 @RestController
-@RequestMapping("/numbers")
-public class NumberController {
+@RequestMapping("/api/user")
+public class UserController{
+	
+	@Autowired
+	private UserService userService;
+	
 
-    @Autowired
-    private NumberService numberService;
+@PostMapping("/register")
+public ResponseEntity<String> registerUser(@RequestBody User user) {
+//	boolean isregisterd=userService.checkUser(user);
+//	if(isregisterd) {
+//		userService.registerUser(user);
+//		return ResponseEntity.ok("User registerd successfully.");
+//		
+//	}else {
+//		return ResponseEntity.badRequest().body("User registration failed as User already exists");
+//	}
+	if(userService.checkUser(user.getUsername())) {
+		return ResponseEntity.badRequest().body("User registration failed as User already exists");
+	}
+	
+	userService.registerUser(user);
+	  return ResponseEntity.ok("User Successfully Registered.");
+	}
 
-    @GetMapping("/{numberId}")
-    public Map<String, Object> getNumbers(@PathVariable String numberId) {
-        return numberService.getNumbers(numberId);
-    }
+	
+	
+	
+   @GetMapping("/fetch")
+  public ResponseEntity<User> fetchUser(@RequestParam  String username) {
+	 User user=  userService.fetchUser(username);
+	 if(user !=null) {
+		 return ResponseEntity.ok(user);
+	 }
+	 else {
+		 return ResponseEntity.notFound().build();
+	 }
+	
+	
+
+	
+}
 }
